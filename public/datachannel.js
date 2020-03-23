@@ -117,7 +117,9 @@ function generateOffer(client) {
 
 io.on('disconnect', () => {
   //for (let client in dataChannels) { clients.push(client); }
-  clients.push(clientID); // added own clientID because hands are named by the former websocket clientID
+  if (isMaster) {
+    clients.push(clientID); // added own clientID because hands are named by the former websocket clientID
+  }
 });
 
 function receiveDataChannelMessage(event) {
