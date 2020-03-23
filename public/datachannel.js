@@ -85,6 +85,9 @@ function startSignaling(client) {
 }
 
 function generateOffer(client) {
+
+  let dataChannelsCount = 0;
+
   rtcPeerConnections[client].onnegotiationneeded = () => {
     rtcPeerConnections[client].createOffer().then((offer) => {
       return rtcPeerConnections[client].setLocalDescription(offer);
@@ -100,6 +103,11 @@ function generateOffer(client) {
     if (dataChannels[client].readyState === 'open') {
       console.log('data channel open and ready for use');
       dataChannels[client].onmessage = receiveDataChannelMessage;
+      dataChannelsCount++;
+      if (dataChannelsCount === 3) {
+        // activate deal button
+        io.emit('goodbye', {target: signalRoom});
+      }
     }
   };
 
