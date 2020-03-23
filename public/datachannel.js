@@ -17,6 +17,7 @@ document.querySelector('#connect').onclick = e => {
   screenName = document.querySelector('#screenName').value
   clientID = io.id;
   io.emit('ready', {screenName, signalRoom});
+  document.querySelector('#connect').disabled = true;
 };
 
 document.querySelector('#startGame').onclick = e => {
@@ -66,6 +67,8 @@ io.on('signalingMessage', function(data) {
 
 function startSignaling(client) {
   console.log('starting signaling');
+  document.querySelector('#startGame').disabled = true;
+
   rtcPeerConnections[client] = new RTCPeerConnection({'iceServers': [{'urls': 'stun:stun.l.google.com:19302'}]});
 
   rtcPeerConnections[client].ondatachannel = event => {
@@ -104,7 +107,7 @@ function generateOffer(client) {
       dataChannels[client].onmessage = receiveDataChannelMessage;
       dataChannelsCount++;
       if (dataChannelsCount === 3) {
-        // activate deal button
+        document.querySelector('#deal').disabled = false;
         io.emit('goodbye', {target: signalRoom});
       }
     }

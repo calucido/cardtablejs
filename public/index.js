@@ -21,7 +21,6 @@ function resetTable() {
 
 document.querySelector('#deal').onclick = () => {
   console.log('attempting to deal');
-  // TODO switch around these if statements
   if (!document.querySelector('#howManyCards').value) {
     alert('How many cards per person?');
   } else {
@@ -108,50 +107,47 @@ function processGameEvent(data) {
 
     console.log(clients)
     
+    if (!hands.myHand) {
+      if (clients.indexOf(clientID) === 0) {
+        clients.shift();
+        screenNames.push(screenNames.shift());
+        displayScreenNames(screenNames);
+      } else if (clients.indexOf(clientID) === 1) {
+        clients.push(clients.shift());
+        clients.shift();
+        screenNames.push(screenNames.shift());
+        screenNames.push(screenNames.shift());
+        displayScreenNames(screenNames);
+      } else if (clients.indexOf(clientID) === 2) {
+        clients.push(clients.shift());
+        clients.push(clients.shift());
+        clients.shift();
+        screenNames.push(screenNames.shift());
+        screenNames.push(screenNames.shift());
+        screenNames.push(screenNames.shift());
+        displayScreenNames(screenNames);
+      } else if (clients.indexOf(clientID) === 3) { // i.e. master
+        screenNames.push(screenNames.shift());
+        screenNames.push(screenNames.shift());
+        screenNames.push(screenNames.shift());
+        displayScreenNames(screenNames);
+      }
+    }
+
     hands = {myHand: new cards.Hand({faceUp: true, x: 300, y: 350})};
+    hands[clients[0]] = new cards.Hand({faceUp: true, x: 50, y: 200});
+    hands[clients[1]] = new cards.Hand({faceUp: true, x: 300, y: 50});
+    hands[clients[2]] = new cards.Hand({faceUp: true, x: 550, y: 200});
 
     if (clients.indexOf(clientID) === 0) {
-      clients.shift();
-      screenNames.push(screenNames.shift());
-      hands[clients[0]] = new cards.Hand({faceUp: true, x: 50, y: 200});
-      hands[clients[1]] = new cards.Hand({faceUp: true, x: 300, y: 50});
-      hands[clients[2]] = new cards.Hand({faceUp: true, x: 550, y: 200});
       handsArray = [hands[clients[2]], hands.myHand, hands[clients[0]], hands[clients[1]]];
-      displayScreenNames(screenNames);
     } else if (clients.indexOf(clientID) === 1) {
-      clients.push(clients.shift());
-      clients.shift();
-      screenNames.push(screenNames.shift());
-      screenNames.push(screenNames.shift());
-      hands[clients[0]] = new cards.Hand({faceUp: true, x: 50, y: 200});
-      hands[clients[1]] = new cards.Hand({faceUp: true, x: 300, y: 50});
-      hands[clients[2]] = new cards.Hand({faceUp: true, x: 550, y: 200});
       handsArray = [hands[clients[1]], hands[clients[2]], hands.myHand, hands[clients[0]]];
-      displayScreenNames(screenNames);
     } else if (clients.indexOf(clientID) === 2) {
-      clients.push(clients.shift());
-      clients.push(clients.shift());
-      clients.shift();
-      screenNames.push(screenNames.shift());
-      screenNames.push(screenNames.shift());
-      screenNames.push(screenNames.shift());
-      hands[clients[0]] = new cards.Hand({faceUp: true, x: 50, y: 200});
-      hands[clients[1]] = new cards.Hand({faceUp: true, x: 300, y: 50});
-      hands[clients[2]] = new cards.Hand({faceUp: true, x: 550, y: 200});
       handsArray = [hands[clients[0]], hands[clients[1]], hands[clients[2]], hands.myHand];
-      displayScreenNames(screenNames);
     } else if (clients.indexOf(clientID) === 3) { // i.e. master
-      screenNames.push(screenNames.shift());
-      screenNames.push(screenNames.shift());
-      screenNames.push(screenNames.shift());
-      hands[clients[0]] = new cards.Hand({faceUp: true, x: 50, y: 200});
-      hands[clients[1]] = new cards.Hand({faceUp: true, x: 300, y: 50});
-      hands[clients[2]] = new cards.Hand({faceUp: true, x: 550, y: 200});
       handsArray = [hands.myHand, hands[clients[0]], hands[clients[1]], hands[clients[2]]];
-      displayScreenNames(screenNames);
     }
-    //hands[clients[0]].rotate(90);
-    //hands[clients[2]].rotate(270);
     setMyHandOnclick('playOne');
     
     cards.resetZIndex();
