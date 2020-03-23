@@ -42,7 +42,7 @@ io.on('connect', socket => {
   socket.on('disconnect', data => {
     for (let room in roomIndex) {
       if (roomIndex[room].ids.indexOf(socket.id) > -1) {
-        roomIndex[data.target].ids.splice(roomIndex[data.target].ids.indexOf(socket.id));
+        roomIndex[room].ids.splice(roomIndex[room].ids.indexOf(socket.id));
       }
       if (roomIndex[room].ids.length === 0) { // only master left
         delete roomIndex[room];
