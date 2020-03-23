@@ -102,26 +102,25 @@ function processGameEvent(data) {
     
     resetTable();
 
-    screenNames = data.msg.screenNames;
-    clients = data.msg.clients;
-
     console.log(clients)
     
     if (!hands.myHand) {
+      screenNames = data.msg.screenNames;
+      clients = data.msg.clients;
       if (clients.indexOf(clientID) === 0) {
-        clients.shift();
+        clients.push(clients.shift());
         screenNames.push(screenNames.shift());
         displayScreenNames(screenNames);
       } else if (clients.indexOf(clientID) === 1) {
         clients.push(clients.shift());
-        clients.shift();
+        clients.push(clients.shift());
         screenNames.push(screenNames.shift());
         screenNames.push(screenNames.shift());
         displayScreenNames(screenNames);
       } else if (clients.indexOf(clientID) === 2) {
         clients.push(clients.shift());
         clients.push(clients.shift());
-        clients.shift();
+        clients.push(clients.shift());
         screenNames.push(screenNames.shift());
         screenNames.push(screenNames.shift());
         screenNames.push(screenNames.shift());

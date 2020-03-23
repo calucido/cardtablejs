@@ -108,7 +108,7 @@ function generateOffer(client) {
       dataChannelsCount++;
       if (dataChannelsCount === 3) {
         document.querySelector('#deal').disabled = false;
-        io.emit('goodbye', {target: signalRoom});
+        io.disconnect();
       }
     }
   };

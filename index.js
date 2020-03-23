@@ -38,21 +38,16 @@ io.on('connect', socket => {
     io.to(data.target).emit('signalingMessage', {type: data.type, message: data.message, from: socket.id});
     //console.log(data.screenName, data.target, data.type, data.message);
   });
-  
-  socket.on('goodbye', data => {
-    if(roomIndex[data.target]) {
-      roomIndex[data.target].ids.splice(roomIndex[data.target].ids.indexOf(socket.id));
-      socket.disconnect(true);
-console.log('roomIndex[data.target].ids', roomIndex[data.target].ids);
-      if (roomIndex[data.target].ids.length === 0) { // only master left
-        delete roomIndex[data.target];
-        console.log(`room ${data.target} has been vacated`);
-console.log('roomIndex', roomIndex);
-        if (Object.keys(roomIndex).length === 0) {
-//          console.log('closing server to save time');
-//          process.exit();
-        }
+
+  socket.on('disconnect', data => {
+    for (let room in roomIndex) {
+      if (roomIndex[room].ids.indexOf(socket.id) > -1) {
+        roomIndex[data.target].ids.splice(roomIndex[data.target].ids.indexOf(socket.id));
+      }
+      if (roomIndex[room].ids.length === 0) { // only master left
+        delete roomIndex[room];
+        console.log(`room ${room} has been vacated`);
       }
     }
-  });
+  });  
 });
