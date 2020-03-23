@@ -108,45 +108,56 @@ function processGameEvent(data) {
       screenNames = data.msg.screenNames;
       clients = data.msg.clients;
       if (clients.indexOf(clientID) === 0) {
-        clients.push(clients.shift());
+        clients.shift();
+        hands = {myHand: new cards.Hand({faceUp: true, x: 300, y: 350})};
+        hands[clients[0]] = new cards.Hand({faceUp: true, x: 50, y: 200});
+        hands[clients[1]] = new cards.Hand({faceUp: true, x: 300, y: 50});
+        hands[clients[2]] = new cards.Hand({faceUp: true, x: 550, y: 200});
+        handsArray = [hands[clients[2]], hands.myHand, hands[clients[0]], hands[clients[1]]];
         screenNames.push(screenNames.shift());
         displayScreenNames(screenNames);
       } else if (clients.indexOf(clientID) === 1) {
         clients.push(clients.shift());
-        clients.push(clients.shift());
+        clients.shift();
+        hands = {myHand: new cards.Hand({faceUp: true, x: 300, y: 350})};
+        hands[clients[0]] = new cards.Hand({faceUp: true, x: 50, y: 200});
+        hands[clients[1]] = new cards.Hand({faceUp: true, x: 300, y: 50});
+        hands[clients[2]] = new cards.Hand({faceUp: true, x: 550, y: 200});
+        handsArray = [hands[clients[1]], hands[clients[2]], hands.myHand, hands[clients[0]]];
         screenNames.push(screenNames.shift());
         screenNames.push(screenNames.shift());
         displayScreenNames(screenNames);
       } else if (clients.indexOf(clientID) === 2) {
         clients.push(clients.shift());
         clients.push(clients.shift());
-        clients.push(clients.shift());
+        clients.shift();
+        hands = {myHand: new cards.Hand({faceUp: true, x: 300, y: 350})};
+        hands[clients[0]] = new cards.Hand({faceUp: true, x: 50, y: 200});
+        hands[clients[1]] = new cards.Hand({faceUp: true, x: 300, y: 50});
+        hands[clients[2]] = new cards.Hand({faceUp: true, x: 550, y: 200});
+        handsArray = [hands[clients[0]], hands[clients[1]], hands[clients[2]], hands.myHand];
         screenNames.push(screenNames.shift());
         screenNames.push(screenNames.shift());
         screenNames.push(screenNames.shift());
         displayScreenNames(screenNames);
       } else if (clients.indexOf(clientID) === 3) { // i.e. master
+        hands = {myHand: new cards.Hand({faceUp: true, x: 300, y: 350})};
+        hands[clients[0]] = new cards.Hand({faceUp: true, x: 50, y: 200});
+        hands[clients[1]] = new cards.Hand({faceUp: true, x: 300, y: 50});
+        hands[clients[2]] = new cards.Hand({faceUp: true, x: 550, y: 200});
+        handsArray = [hands.myHand, hands[clients[0]], hands[clients[1]], hands[clients[2]]];
         screenNames.push(screenNames.shift());
         screenNames.push(screenNames.shift());
         screenNames.push(screenNames.shift());
         displayScreenNames(screenNames);
       }
-    }
+    } /*else {
+      hands = {myHand: new cards.Hand({faceUp: true, x: 300, y: 350})};
+      hands[clients[0]] = new cards.Hand({faceUp: true, x: 50, y: 200});
+      hands[clients[1]] = new cards.Hand({faceUp: true, x: 300, y: 50});
+      hands[clients[2]] = new cards.Hand({faceUp: true, x: 550, y: 200});
+    }*/
 
-    hands = {myHand: new cards.Hand({faceUp: true, x: 300, y: 350})};
-    hands[clients[0]] = new cards.Hand({faceUp: true, x: 50, y: 200});
-    hands[clients[1]] = new cards.Hand({faceUp: true, x: 300, y: 50});
-    hands[clients[2]] = new cards.Hand({faceUp: true, x: 550, y: 200});
-
-    if (clients.indexOf(clientID) === 0) {
-      handsArray = [hands[clients[2]], hands.myHand, hands[clients[0]], hands[clients[1]]];
-    } else if (clients.indexOf(clientID) === 1) {
-      handsArray = [hands[clients[1]], hands[clients[2]], hands.myHand, hands[clients[0]]];
-    } else if (clients.indexOf(clientID) === 2) {
-      handsArray = [hands[clients[0]], hands[clients[1]], hands[clients[2]], hands.myHand];
-    } else if (clients.indexOf(clientID) === 3) { // i.e. master
-      handsArray = [hands.myHand, hands[clients[0]], hands[clients[1]], hands[clients[2]]];
-    }
     setMyHandOnclick('playOne');
     
     cards.resetZIndex();
