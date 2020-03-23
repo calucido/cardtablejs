@@ -9,6 +9,7 @@ let dataChannels = {};
 let screenNames = [];
 let message;
 let isMaster = false;
+let dataChannelsCount = 0;
 
 io = io.connect();
 document.querySelector('#connect').onclick = e => {
@@ -85,8 +86,6 @@ function startSignaling(client) {
 }
 
 function generateOffer(client) {
-
-  let dataChannelsCount = 0;
 
   rtcPeerConnections[client].onnegotiationneeded = () => {
     rtcPeerConnections[client].createOffer().then((offer) => {
