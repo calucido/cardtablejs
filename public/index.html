@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>cards.js - Example</title>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="index.css"/>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+</head>
+<body>
+  <h1>Cards.js - Example</h1>
+	
+  <img class="preload" src="img/cards.png"/>
+
+  <input type="text" id="screenName"></input>
+  <input type="text" id="room"></input>
+  <button id="connect">Join</button>
+  <button id="startGame">Start Game</button>
+		
+  <div id="card-table-container">
+    <div id="player-label-B" class="player-label"></div>
+    <div id="player-label-L" class="player-label"></div>
+    <div id="player-label-T" class="player-label"></div>
+    <div id="player-label-R" class="player-label"></div>
+    <div id="card-table"></div>
+  </div>
+  <input type="number" id="howManyCards"></input>
+  <button id="deal">DEAL</button>
+  <footer>
+    cards.js was created by <a href="http://einaregilsson.com">Einar Egilsson</a> and is licensed
+    under the MIT license. The card images were created by <a href="http://nicubunu.ro">Nicu Buculei</a> and are 
+    in the public domain. 
+  </footer>
+  <!-- load this at the bottom so the #card-table element exists -->
+    <script src="cards.js"></script>
+    <script src="index.js"></script>
+    <script src="datachannel.js"></script>
+</body>
+</html>
