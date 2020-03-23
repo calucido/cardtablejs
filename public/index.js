@@ -150,8 +150,8 @@ function processGameEvent(data) {
       handsArray = [hands.myHand, hands[clients[0]], hands[clients[1]], hands[clients[2]]];
       displayScreenNames(screenNames);
     }
-    hands[clients[0]].rotate(90);
-    hands[clients[2]].rotate(270);
+    //hands[clients[0]].rotate(90);
+    //hands[clients[2]].rotate(270);
     setMyHandOnclick('playOne');
     
     cards.resetZIndex();

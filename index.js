@@ -43,9 +43,11 @@ io.on('connect', socket => {
     if(roomIndex[data.target]) {
       roomIndex[data.target].ids.splice(roomIndex[data.target].ids.indexOf(socket.id));
       socket.disconnect(true);
+console.log('roomIndex[data.target].ids', roomIndex[data.target].ids);
       if (roomIndex[data.target].ids.length === 0) { // only master left; master won't leave on its own
         delete roomIndex[data.target];
         console.log(`room ${data.target} has been vacated`);
+console.log('roomIndex', roomIndex);
         if (Object.keys(roomIndex).length === 0) {
           console.log('closing server to save time');
           process.exit();
