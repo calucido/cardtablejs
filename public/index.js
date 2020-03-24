@@ -43,9 +43,9 @@ document.querySelector('#sort-hand-caps').onclick = () => {
   sendEvent({type: 'sortHand', msg: {sortType: 'caps'}, clientID});
 };
 
-//document.querySelector('#sort-hand-by-suit').onclick = () => {
-//  sendEvent({type: 'sortHand', msg: {sortType: 'bySuit'}, clientID});
-//};
+document.querySelector('#sort-hand-by-suit').onclick = () => {
+  sendEvent({type: 'sortHand', msg: {sortType: 'bySuit'}, clientID});
+};
 
 document.querySelector('#trade-switch').onclick = () => {
   if (document.querySelector('#trade-switch').checked) { // counterintuitive, but I guess onclick fires after it's saved as checked
@@ -88,13 +88,21 @@ function sortHand(handID, sortType) {
         return parseFloat(b.rank)-parseFloat(a.rank);
       }
     });
-    hands[handID].render();
   } else if (sortType === 'byRank') {
     hands[handID].sort((a, b) => {
       return parseFloat(b.rank)-parseFloat(a.rank);
     });
   } else if (sortType === 'bySuit') {
+    hands[handID].sort((a, b) => {
+      if (a.suit === b.suit) {
+        return a.rank-b.rank;
+      } else {
+        if (a.suit<b.suit) { return -1; }
+        else { return 1; } // it's not equal, otherwise would have been caught earlier
+      }
+    });
   }
+  hands[handID].render();
 }
 
 function setPlayPileOnclick(action) {
@@ -245,12 +253,14 @@ function processGameEvent(data) {
 
   } else if (data.type === 'disableTrading') {
 
+    document.querySelector('#trade-switch').checked = false;
     playPile.faceUp = true;
     playPile.render();
     setPlayPileOnclick('discard');
 
   } else if (data.type === 'enableTrading') {
 
+    document.querySelector('#trade-switch').checked = true;
     playPile.faceUp = false;
     playPile.render();
     setPlayPileOnclick('addToHand');
