@@ -147,30 +147,30 @@ function processGameEvent(data) {
       clients = data.msg.clients;
       if (clients.indexOf(clientID) === 0) {
         hands = {myHand: new cards.Hand({faceUp: true, x: 300, y: 350})};
-        hands[clients[1]] = new cards.Hand({faceUp: true, x: 50, y: 200});
-        hands[clients[2]] = new cards.Hand({faceUp: true, x: 300, y: 50});
-        hands[clients[3]] = new cards.Hand({faceUp: true, x: 550, y: 200});
+        hands[clients[1]] = new cards.Hand({faceUp: false, x: 50, y: 200});
+        hands[clients[2]] = new cards.Hand({faceUp: false, x: 300, y: 50});
+        hands[clients[3]] = new cards.Hand({faceUp: false, x: 550, y: 200});
         handsArray = [hands.myHand, hands[clients[1]], hands[clients[2]], hands[clients[3]]];
       } else if (clients.indexOf(clientID) === 1) {
         hands = {myHand: new cards.Hand({faceUp: true, x: 300, y: 350})};
-        hands[clients[2]] = new cards.Hand({faceUp: true, x: 50, y: 200});
-        hands[clients[3]] = new cards.Hand({faceUp: true, x: 300, y: 50});
-        hands[clients[0]] = new cards.Hand({faceUp: true, x: 550, y: 200});
+        hands[clients[2]] = new cards.Hand({faceUp: false, x: 50, y: 200});
+        hands[clients[3]] = new cards.Hand({faceUp: false, x: 300, y: 50});
+        hands[clients[0]] = new cards.Hand({faceUp: false, x: 550, y: 200});
         handsArray = [hands[clients[0]], hands.myHand, hands[clients[2]], hands[clients[3]]];
         screenNames.push(screenNames.shift());
       }  else if (clients.indexOf(clientID) === 2) {
         hands = {myHand: new cards.Hand({faceUp: true, x: 300, y: 350})};
-        hands[clients[3]] = new cards.Hand({faceUp: true, x: 50, y: 200});
-        hands[clients[0]] = new cards.Hand({faceUp: true, x: 300, y: 50});
-        hands[clients[1]] = new cards.Hand({faceUp: true, x: 550, y: 200});
+        hands[clients[3]] = new cards.Hand({faceUp: false, x: 50, y: 200});
+        hands[clients[0]] = new cards.Hand({faceUp: false, x: 300, y: 50});
+        hands[clients[1]] = new cards.Hand({faceUp: false, x: 550, y: 200});
         screenNames.push(screenNames.shift());
         screenNames.push(screenNames.shift());
         handsArray = [hands[clients[0]], hands[clients[1]], hands.myHand, hands[clients[3]]];
       } else if (clients.indexOf(clientID) === 3) {
         hands = {myHand: new cards.Hand({faceUp: true, x: 300, y: 350})};
-        hands[clients[0]] = new cards.Hand({faceUp: true, x: 50, y: 200});
-        hands[clients[1]] = new cards.Hand({faceUp: true, x: 300, y: 50});
-        hands[clients[2]] = new cards.Hand({faceUp: true, x: 550, y: 200});
+        hands[clients[0]] = new cards.Hand({faceUp: false, x: 50, y: 200});
+        hands[clients[1]] = new cards.Hand({faceUp: false, x: 300, y: 50});
+        hands[clients[2]] = new cards.Hand({faceUp: false, x: 550, y: 200});
         screenNames.push(screenNames.shift());
         screenNames.push(screenNames.shift());
         screenNames.push(screenNames.shift());
