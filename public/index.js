@@ -86,13 +86,9 @@ function createNetworkCard(string, clientID) {
 }
 
 function sendEvent(data) {
-  processGameEvent(data);
-  for (let channel in dataChannels) { // if master, then send to everyone; if not, then send only to master, because that's the only channel in dataChannels
-    if (channel !== data.clientID) { // no need to send the message to client that sent it
-      console.log('data to send', data);
-      dataChannels[channel].send(JSON.stringify(data));
-    }
-  }
+  data.signalRoom = signalRoom;
+  console.log('data to send', data);
+  io.emit('gameEvent', data);
 }
 
 function processGameEvent(data) {
@@ -106,57 +102,48 @@ function processGameEvent(data) {
     
     if (!hands.myHand) {
       screenNames = data.msg.screenNames;
+      console.log(screenNames)
       clients = data.msg.clients;
       if (clients.indexOf(clientID) === 0) {
-        clients.shift();
         hands = {myHand: new cards.Hand({faceUp: true, x: 300, y: 350})};
-        hands[clients[0]] = new cards.Hand({faceUp: true, x: 50, y: 200});
-        hands[clients[1]] = new cards.Hand({faceUp: true, x: 300, y: 50});
-        hands[clients[2]] = new cards.Hand({faceUp: true, x: 550, y: 200});
-        handsArray = [hands[clients[2]], hands.myHand, hands[clients[0]], hands[clients[1]]];
-        screenNames.push(screenNames.shift());
-        displayScreenNames(screenNames);
+        hands[clients[1]] = new cards.Hand({faceUp: true, x: 50, y: 200});
+        hands[clients[2]] = new cards.Hand({faceUp: true, x: 300, y: 50});
+        hands[clients[3]] = new cards.Hand({faceUp: true, x: 550, y: 200});
+        handsArray = [hands.myHand, hands[clients[1]], hands[clients[2]], hands[clients[3]]];
       } else if (clients.indexOf(clientID) === 1) {
-        clients.push(clients.shift());
-        clients.shift();
+        hands = {myHand: new cards.Hand({faceUp: true, x: 300, y: 350})};
+        hands[clients[2]] = new cards.Hand({faceUp: true, x: 50, y: 200});
+        hands[clients[3]] = new cards.Hand({faceUp: true, x: 300, y: 50});
+        hands[clients[0]] = new cards.Hand({faceUp: true, x: 550, y: 200});
+        handsArray = [hands[clients[0]], hands.myHand, hands[clients[2]], hands[clients[3]]];
+        screenNames.push(screenNames.shift());
+      }  else if (clients.indexOf(clientID) === 2) {
+        hands = {myHand: new cards.Hand({faceUp: true, x: 300, y: 350})};
+        hands[clients[3]] = new cards.Hand({faceUp: true, x: 50, y: 200});
+        hands[clients[0]] = new cards.Hand({faceUp: true, x: 300, y: 50});
+        hands[clients[1]] = new cards.Hand({faceUp: true, x: 550, y: 200});
+        screenNames.push(screenNames.shift());
+        screenNames.push(screenNames.shift());
+        handsArray = [hands[clients[0]], hands[clients[1]], hands.myHand, hands[clients[3]]];
+      } else if (clients.indexOf(clientID) === 3) {
         hands = {myHand: new cards.Hand({faceUp: true, x: 300, y: 350})};
         hands[clients[0]] = new cards.Hand({faceUp: true, x: 50, y: 200});
         hands[clients[1]] = new cards.Hand({faceUp: true, x: 300, y: 50});
         hands[clients[2]] = new cards.Hand({faceUp: true, x: 550, y: 200});
-        handsArray = [hands[clients[1]], hands[clients[2]], hands.myHand, hands[clients[0]]];
         screenNames.push(screenNames.shift());
         screenNames.push(screenNames.shift());
-        displayScreenNames(screenNames);
-      } else if (clients.indexOf(clientID) === 2) {
-        clients.push(clients.shift());
-        clients.push(clients.shift());
-        clients.shift();
-        hands = {myHand: new cards.Hand({faceUp: true, x: 300, y: 350})};
-        hands[clients[0]] = new cards.Hand({faceUp: true, x: 50, y: 200});
-        hands[clients[1]] = new cards.Hand({faceUp: true, x: 300, y: 50});
-        hands[clients[2]] = new cards.Hand({faceUp: true, x: 550, y: 200});
+        screenNames.push(screenNames.shift());
         handsArray = [hands[clients[0]], hands[clients[1]], hands[clients[2]], hands.myHand];
-        screenNames.push(screenNames.shift());
-        screenNames.push(screenNames.shift());
-        screenNames.push(screenNames.shift());
-        displayScreenNames(screenNames);
-      } else if (clients.indexOf(clientID) === 3) { // i.e. master
-        hands = {myHand: new cards.Hand({faceUp: true, x: 300, y: 350})};
-        hands[clients[0]] = new cards.Hand({faceUp: true, x: 50, y: 200});
-        hands[clients[1]] = new cards.Hand({faceUp: true, x: 300, y: 50});
-        hands[clients[2]] = new cards.Hand({faceUp: true, x: 550, y: 200});
-        handsArray = [hands.myHand, hands[clients[0]], hands[clients[1]], hands[clients[2]]];
-        screenNames.push(screenNames.shift());
-        screenNames.push(screenNames.shift());
-        screenNames.push(screenNames.shift());
-        displayScreenNames(screenNames);
       }
-    } /*else {
-      hands = {myHand: new cards.Hand({faceUp: true, x: 300, y: 350})};
-      hands[clients[0]] = new cards.Hand({faceUp: true, x: 50, y: 200});
-      hands[clients[1]] = new cards.Hand({faceUp: true, x: 300, y: 50});
-      hands[clients[2]] = new cards.Hand({faceUp: true, x: 550, y: 200});
-    }*/
+        console.log(handsArray);
+    } else {
+      for (let hand of handsArray) {
+        while (hand.length > 0) {
+          hand.removeCard(hand[0]);
+        }
+      }
+    }
+    displayScreenNames(screenNames);
 
     setMyHandOnclick('playOne');
     

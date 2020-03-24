@@ -30,13 +30,13 @@ io.on('connect', socket => {
   });
 
   socket.on('start', data => {
-    io.to(socket.id).emit('clientList', JSON.stringify({clients: roomIndex[data.signalRoom].ids, screenNames: roomIndex[data.signalRoom].screenNames}));
+    io.to(data.signalRoom).emit('clientList', JSON.stringify({clients: roomIndex[data.signalRoom].ids, screenNames: roomIndex[data.signalRoom].screenNames}));
     console.log(`${data.screenName} has started connecting ${data.signalRoom}`);
   });
 
-  socket.on('signal', data => {
-    io.to(data.target).emit('signalingMessage', {type: data.type, message: data.message, from: socket.id});
-    //console.log(data.screenName, data.target, data.type, data.message);
+  socket.on('gameEvent', data => {
+    console.log('got event', data);
+    io.to(data.signalRoom).emit('gameEvent', data);
   });
 
   socket.on('disconnect', data => {
