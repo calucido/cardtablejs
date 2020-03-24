@@ -39,6 +39,14 @@ document.querySelector('#deal').onclick = () => {
   }
 };
 
+document.querySelector('#sort-hand-caps').onclick = () => {
+  sendEvent({type: 'sortHand', msg: {sortType: 'caps'}, clientID});
+};
+
+//document.querySelector('#sort-hand-by-suit').onclick = () => {
+//  sendEvent({type: 'sortHand', msg: {sortType: 'bySuit'}, clientID});
+//};
+
 function setDeckOnclick() {
   deck.click(function(card) {
     if (card === deck.topCard()) {
@@ -56,6 +64,28 @@ function setMyHandOnclick(action) {
     });
   } else {
     // trading logic
+  }
+}
+
+function sortHand(handID, sortType) {
+  if (sortType === 'caps') {
+    hands[handID].sort((a, b) => {
+      if (parseFloat(a.rank) === 2 && parseFloat(b.rank) === 2) {
+        return 0;
+      } else if (parseFloat(b.rank) === 2) {
+        return 1;
+      } else if (parseFloat(a.rank) === 2) {
+        return -1;
+      } else {
+        return parseFloat(b.rank)-parseFloat(a.rank);
+      }
+    });
+    hands[handID].render();
+  } else if (sortType === 'byRank') {
+    hands[handID].sort((a, b) => {
+      return parseFloat(b.rank)-parseFloat(a.rank);
+    });
+  } else if (sortType === 'bySuit') {
   }
 }
 
@@ -92,17 +122,14 @@ function sendEvent(data) {
 }
 
 function processGameEvent(data) {
-  console.log(data);
+  console.log('received', data);
   
   if (data.type === 'setup') {
     
     resetTable();
 
-    console.log(clients)
-    
     if (!hands.myHand) {
       screenNames = data.msg.screenNames;
-      console.log(screenNames)
       clients = data.msg.clients;
       if (clients.indexOf(clientID) === 0) {
         hands = {myHand: new cards.Hand({faceUp: true, x: 300, y: 350})};
@@ -189,6 +216,14 @@ function processGameEvent(data) {
     }
     discardPile.render();
     playPile.render();
+
+  } else if (data.type === 'sortHand') {
+
+    if (hands[data.clientID]) {
+      sortHand(data.clientID, data.msg.sortType);
+    } else {
+      sortHand('myHand', data.msg.sortType);
+    }
 
   }
   // logic for dealing cards etc
