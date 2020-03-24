@@ -47,6 +47,14 @@ document.querySelector('#sort-hand-caps').onclick = () => {
 //  sendEvent({type: 'sortHand', msg: {sortType: 'bySuit'}, clientID});
 //};
 
+document.querySelector('#trade-switch').onclick = () => {
+  if (document.querySelector('#trade-switch').checked) { // counterintuitive, but I guess onclick fires after it's saved as checked
+    sendEvent({type: 'enableTrading'});
+  } else {
+    sendEvent({type: 'disableTrading'});
+  }
+};
+
 function setDeckOnclick() {
   deck.click(function(card) {
     if (card === deck.topCard()) {
@@ -89,10 +97,16 @@ function sortHand(handID, sortType) {
   }
 }
 
-function setPlayPileOnclick() {
-  playPile.click(card => { // it doesn't matter what card is clicked
-    sendEvent({type: 'discardPlayPile'});
-  });
+function setPlayPileOnclick(action) {
+  if (action === 'discard') {
+    playPile.click(card => { // it doesn't matter what card is clicked
+      sendEvent({type: 'discardPlayPile'});
+    });
+  } else if (action === 'addToHand') {
+    playPile.click(card => {
+      sendEvent({type: 'addFromPlayPile', clientID});
+    });
+  }
 }
 
 function displayScreenNames(names) {
@@ -184,7 +198,7 @@ function processGameEvent(data) {
     deck.deal(data.msg.howManyCards, handsArray, 100);
 
     playPile = new cards.Deck({faceUp: true, x: 300, y: 200});
-    setPlayPileOnclick();
+    setPlayPileOnclick('discard');
 
     discardPile = new cards.Deck({faceUp: true, x: 550, y: 350});
   
@@ -223,6 +237,32 @@ function processGameEvent(data) {
       sortHand(data.clientID, data.msg.sortType);
     } else {
       sortHand('myHand', data.msg.sortType);
+    }
+
+  } else if (data.type === 'undo') {
+
+    
+
+  } else if (data.type === 'disableTrading') {
+
+    playPile.faceUp = true;
+    playPile.render();
+    setPlayPileOnclick('discard');
+
+  } else if (data.type === 'enableTrading') {
+
+    playPile.faceUp = false;
+    playPile.render();
+    setPlayPileOnclick('addToHand');
+
+  } else if (data.type === 'addFromPlayPile') {
+
+    if (hands[data.clientID]) {
+      hands[data.clientID].addCard(playPile.topCard());
+      hands[data.clientID].render();
+    } else {
+      hands.myHand.addCard(playPile.topCard());
+      hands.myHand.render();
     }
 
   }
