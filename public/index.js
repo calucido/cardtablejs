@@ -17,6 +17,8 @@ function resetTable() {
   tableContainer.append(document.createElement('div'));
   tableContainer.children[4].setAttribute('id', 'card-table');
   table = document.querySelector('#card-table');
+  document.querySelector('#sort-hand-caps').disabled = true;
+  document.querySelector('#sort-hand-by-suit').disabled = true;
 }
 
 document.querySelector('#deal').onclick = () => {
@@ -32,7 +34,7 @@ document.querySelector('#deal').onclick = () => {
       for (let i = 0; i<52; i++) {
         sendableDeck.push(deck[i].toString());
       }
-      sendEvent({type: 'setup', msg: {clients, screenNames, deck: sendableDeck, howManyCards: document.querySelector('#howManyCards').value}, clientID});
+      sendEvent({type: 'setup', msg: {clients, screenNames, deck: sendableDeck, howManyCards: document.querySelector('#howManyCards').value/*, capsDeal: !document.querySelector('#caps-switch').disabled*/}, clientID});
     } else {
       alert('Only the person who started the session can deal.');
     }
@@ -185,6 +187,7 @@ function processGameEvent(data) {
         handsArray = [hands[clients[0]], hands[clients[1]], hands[clients[2]], hands.myHand];
       }
         console.log(handsArray);
+      displayScreenNames(screenNames);
     } else {
       for (let hand of handsArray) {
         while (hand.length > 0) {
@@ -192,18 +195,31 @@ function processGameEvent(data) {
         }
       }
     }
-    displayScreenNames(screenNames);
 
     setMyHandOnclick('playOne');
     
     cards.resetZIndex();
     deck = new cards.Deck({x: 50, y: 350});
-    setDeckOnclick();
+    // setDeckOnclick();
     for (let i=0; i<data.msg.deck.length; i++) {
       deck.addCard(createNetworkCard(data.msg.deck[i]));
     }
     deck.render();
-    deck.deal(data.msg.howManyCards, handsArray, 100);
+
+    if (data.msg.capsDeal) {
+      hands.myHand.faceUp = false;
+    }
+    deck.deal(data.msg.howManyCards, handsArray, 40, () => {
+      if (data.msg.capsDeal) {
+        for (let hand of handsArray) {
+          console.log('hand', hand)
+          hand[hand.length - 1].showCard();
+        }
+      }
+    });
+
+    document.querySelector('#sort-hand-caps').disabled = false;
+    document.querySelector('#sort-hand-by-suit').disabled = false;
 
     playPile = new cards.Deck({faceUp: true, x: 300, y: 200});
     setPlayPileOnclick('discard');

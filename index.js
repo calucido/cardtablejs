@@ -43,6 +43,7 @@ io.on('connect', socket => {
     for (let room in roomIndex) {
       if (roomIndex[room].ids.indexOf(socket.id) > -1) {
         roomIndex[room].ids.splice(roomIndex[room].ids.indexOf(socket.id));
+        io.to(room).emit('lostClient');
       }
       if (roomIndex[room].ids.length === 0) { // only master left
         delete roomIndex[room];
