@@ -48,6 +48,7 @@ io.on('clientList', data => {
       alert(`You need four players to start a game. There are currently ${data.clients.length} players in the room. If you thought four players had joined, try refreshing and joining a different room.`);
       isMaster = false;
     }
+    document.querySelector('#start-game').disabled = false;
   }
 });
 

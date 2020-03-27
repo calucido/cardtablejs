@@ -34,7 +34,7 @@ document.querySelector('#deal').onclick = () => {
       for (let i = 0; i<52; i++) {
         sendableDeck.push(deck[i].toString());
       }
-      sendEvent({type: 'setup', msg: {clients, screenNames, deck: sendableDeck, howManyCards: document.querySelector('#howManyCards').value/*, capsDeal: !document.querySelector('#caps-switch').disabled*/}, clientID});
+      sendEvent({type: 'setup', msg: {clients, screenNames, deck: sendableDeck, howManyCards: document.querySelector('#howManyCards').value, capsDeal: document.querySelector('#caps-switch').checked}, clientID});
     } else {
       alert('Only the person who started the session can deal.');
     }
@@ -70,7 +70,6 @@ function setMyHandOnclick(action) {
     hands.myHand.click(card => {
       let cardIndex = hands.myHand.indexOf(card);
       sendEvent({type: 'playOne', msg: {cardIndex}, clientID}); 
-      console.log('played ' + card);
     });
   } else {
     // trading logic
@@ -186,10 +185,10 @@ function processGameEvent(data) {
         screenNames.push(screenNames.shift());
         handsArray = [hands[clients[0]], hands[clients[1]], hands[clients[2]], hands.myHand];
       }
-        console.log(handsArray);
       displayScreenNames(screenNames);
     } else {
       for (let hand of handsArray) {
+        hand.claimant = '';
         while (hand.length > 0) {
           hand.removeCard(hand[0]);
         }
@@ -208,12 +207,15 @@ function processGameEvent(data) {
 
     if (data.msg.capsDeal) {
       hands.myHand.faceUp = false;
+      hands.myHand.render();
     }
     deck.deal(data.msg.howManyCards, handsArray, 40, () => {
       if (data.msg.capsDeal) {
-        for (let hand of handsArray) {
-          console.log('hand', hand)
-          hand[hand.length - 1].showCard();
+        for (let hand in hands) {
+          hands[hand][hands[hand].length - 1].showCard();
+          hands[hand].click(card => {
+            sendEvent({type: 'claimHand', msg: {hand: (hand === 'myHand') ? clientID : hand}, clientID});
+          });
         }
       }
     });
@@ -226,6 +228,48 @@ function processGameEvent(data) {
 
     discardPile = new cards.Deck({faceUp: true, x: 550, y: 350});
   
+  } else if (data.type === 'claimHand') {
+
+    //flip card, keep track
+    if (data.msg.hand === clientID) {
+      data.msg.hand = 'myHand'
+    }
+    hands[data.msg.hand][hands[data.msg.hand].length - 1].hideCard();
+    hands[data.msg.hand].claimant = data.clientID;
+    hands[data.msg.hand].click(() => {return null;});
+    let claimedCount = 0; // reset hand claimant upon deal
+    for (let hand in hands) {
+      if (hands[hand].claimant) {
+        claimedCount++;
+        if (claimedCount === 4) {
+          let tempHands = {};
+          for (let client of clients) {
+            if (client === clientID) { client = 'myHand'; }
+            tempHands[client] = new cards.Hand();
+          }
+          for (let client of clients) {
+            if (client === clientID) { client = 'myHand'; }
+            if (hands[client].claimant === clientID) { claimant = 'myHand'; } else { claimant = hands[client].claimant }
+            if (client !== claimant) {
+              while (hands[client].length > 0) {
+                tempHands[claimant].addCard(hands[client][0]);
+              }
+            }
+          }
+          for (let client of clients) {
+            if (client === clientID) { client = 'myHand'; }
+            while (tempHands[client].length > 0) {
+              hands[client].addCard(tempHands[client][0]);
+            }
+            hands[client].render();
+          }
+          hands.myHand.faceUp = true;
+          hands.myHand.render();
+          setMyHandOnclick('playOne');
+        }
+      }
+    }
+
   } else if (data.type === 'drawOne') {
     
     if (hands[data.clientID]) {
