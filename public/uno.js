@@ -5,12 +5,11 @@
 var cards = (function() {
 	//The global options
 	var opt = {
-		cardSize : {width:69,height:94, padding:18},
+		cardSize : {width:64,height:96, padding:22},
 		animationSpeed : 500,
 		table : 'body',
 		cardback : 'red',
-		acesHigh : false,
-		cardsUrl : 'img/cards.png',
+		cardsUrl : 'img/uno-sprite-sheet.png',
 		blackJoker : false,
 		redJoker :  false
 	};
@@ -35,17 +34,15 @@ var cards = (function() {
 				}
 			}
 		}
-		var start = opt.acesHigh ? 2 : 1;
-		var end = start + 12;
 		opt.table = $(opt.table)[0];
 		if ($(opt.table).css('position') == 'static') {
 			$(opt.table).css('position', 'relative');
 		}
-		for (var i = start; i <= end; i++) {
-			all.push(new Card('h', i, opt.table));
-                	all.push(new Card('s', i, opt.table));
-                	all.push(new Card('d', i, opt.table));
-                	all.push(new Card('c', i, opt.table));
+		for (var i = 1; i <= 27; i++) {
+			all.push(new Card('r', i, opt.table));
+                	all.push(new Card('y', i, opt.table));
+                	all.push(new Card('g', i, opt.table));
+                	all.push(new Card('b', i, opt.table));
 		}
 		if (opt.blackJoker) {
 			all.push(new Card('bj', 0, opt.table));
@@ -109,12 +106,9 @@ var cards = (function() {
 		},
 		
 		showCard : function() {
-			var offsets = { "c": 0, "C": 0, "d": 1, "D": 1, "h": 2, "H": 2, "s": 3, "S": 3 };
+			var offsets = { "r": 0, "R": 0, "y": 1, "Y": 1, "g": 2, "G": 2, "b": 3, "B": 3 };
 			var xpos, ypos;
 			var rank = this.rank;
-			if (rank == 14) {
-				rank = 1; // High aces must work as well.
-			}
 			xpos = -rank * opt.cardSize.width;
 			ypos = -offsets[this.suit] * opt.cardSize.height;
 			this.rotate(0);
@@ -168,6 +162,11 @@ var cards = (function() {
 				}
 			}
 			return false;
+		},
+
+		obliterateCard : function(card) {
+			card.el.remove();
+			this.removeCard(card);
 		},
 
 		init : function(options) {

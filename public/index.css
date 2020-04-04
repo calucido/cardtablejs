@@ -55,10 +55,12 @@ h1 {
 .player-label {
   position: absolute;
   z-index: 9999999;
+  background-color: white;
+  padding: 0 4px;
 }
 
 #player-label-B {
-  top: 350px;
+  top: 280px;
   left: 300px;
 }
 #player-label-L {
@@ -72,6 +74,10 @@ h1 {
 #player-label-R {
   top: 200px;
   left: 550px;
+}
+
+#log-container {
+  display: none;
 }
 
 footer {

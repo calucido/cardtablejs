@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>cards.js - Example</title>
+  <title>Online Uno</title>
   <meta charset="UTF-8">
   <link rel="stylesheet" href="index.css"/>
   <script src="/socket.io/socket.io.js"></script>
@@ -10,9 +10,9 @@
 <body>
   <h1>CardTableJS</h1>
 	
-  <img class="preload" src="img/cards.png"/>
+  <img class="preload" src="img/uno-sprite-sheet.png"/>
 
-  <p><a href="/uno.html">Uno Version</a></p>
+  <p><a href="/">Regular Cards Version</a></p>
 
   <input type="text" id="screenName" placeholder="screen name"></input>
   <input type="text" id="room" placeholder="room #"></input>
@@ -31,18 +31,18 @@
   <input type="checkbox" id="caps-switch"></input>
   <label for="caps-switch">Deal for Capitalism?</label>
   <p>Sort:</p>
-  <button id="sort-hand-caps" disabled="true">By rank (high 2s; good for Capitalism)</button>
-  <button id="sort-hand-by-suit" disabled="true">By suit (good for Hearts)</button>
+  <button id="sort-hand-caps" disabled="true">By #</button>
+  <button id="sort-hand-by-suit" disabled="true">By color</button>
   <br />
   <input type="checkbox" id="trade-switch"></input>
   <label for="trade-switch">Allow trading right now?</label>
   <br />
   <div id="log-container"></div>
   <footer>
-    cardtablejs was created by Calvin Lucido. It relies heavily on <a href="https://github.com/einaregilsson/cards.js">cards.js</a>, which was created by <a href="http://einaregilsson.com">Einar Egilsson</a> and is licensed under the MIT license. The card images were created by <a href="http://nicubunu.ro">Nicu Buculei</a> and are in the public domain. 
+    cardtablejs was created by Calvin Lucido. It relies heavily on <a href="https://github.com/einaregilsson/cards.js">cards.js</a>, which was created by <a href="http://einaregilsson.com">Einar Egilsson</a> and is licensed under the MIT license. The card images were ripped by Spacemodo. 
   </footer>
   <!-- load this at the bottom so the #card-table element exists -->
-    <script src="cards.js"></script>
+    <script src="uno.js"></script>
     <script src="index.js"></script>
     <script src="datachannel.js"></script>
 </body>
