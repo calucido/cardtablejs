@@ -4,12 +4,8 @@ let signalRoom;
 let screenName;
 let clientID;
 let clients = [];
-let rtcPeerConnections = {};
-let dataChannels = {};
 let screenNames = [];
-let message;
 let isMaster = false;
-let dataChannelsCount = 0;
 
 document.querySelector('#start-game').disabled = true; // fix for some browsers not disabling on reload
 
@@ -36,7 +32,7 @@ document.querySelector('#start-game').onclick = e => {
 
 io.on('clientList', data => {
   data = JSON.parse(data);
-  if (data.clients.length === 4) {
+  if (data.clients.length >= 4) {
     clients = data.clients;
     screenNames = data.screenNames;
     if (isMaster) {
@@ -45,7 +41,7 @@ io.on('clientList', data => {
     document.querySelector('#start-game').disabled = true;
   } else {
     if (isMaster) {
-      alert(`You need four players to start a game. There are currently ${data.clients.length} players in the room. If you thought four players had joined, try refreshing and joining a different room.`);
+      alert(`You need at least four players to start a game. There are currently ${data.clients.length} players in the room. If you thought four players had joined, try refreshing and joining a different room.`);
       isMaster = false;
     }
     document.querySelector('#start-game').disabled = false;

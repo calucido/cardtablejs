@@ -8,14 +8,37 @@ deck.render({immediate:true}); // do all this so that it looks pretty upon pagel
 
 let hands = {};
 let handsArray = [];
-let sendableDeck = [];
 let playPile, discardPile;
+
+const handPositions = {
+  4: [
+    { x: 300, y: 350 },
+    { x: 50, y: 200 },
+    { x: 300, y: 50 },
+    { x: 550, y: 200 }
+  ],
+  5: [
+    { x: 300, y: 350 },
+    { x: 50, y: 200 },
+    { x: 50, y: 50 },
+    { x: 550, y: 50 },
+    { x: 550, y: 200 }
+  ],
+  6: [
+    { x: 300, y: 350 },
+    { x: 50, y: 200 },
+    { x: 50, y: 50 },
+    { x: 300, y: 50 },
+    { x: 550, y: 50 },
+    { x: 550, y: 200 }
+  ]
+};
 
 function resetTable() {
   console.log('clearing table');
   table.remove();
   tableContainer.append(document.createElement('div'));
-  tableContainer.children[4].setAttribute('id', 'card-table');
+  tableContainer.children[tableContainer.children.length - 1].setAttribute('id', 'card-table');
   table = document.querySelector('#card-table');
   document.querySelector('#sort-hand-caps').disabled = true;
   document.querySelector('#sort-hand-by-suit').disabled = true;
@@ -30,7 +53,7 @@ document.querySelector('#deal').onclick = () => {
       deck = new cards.Deck();
       deck.addCards(cards.all);
       cards.shuffle(deck);
-      sendableDeck = []; // to prevent duplicate cards on subsequent deals
+      let sendableDeck = []; // to prevent duplicate cards on subsequent deals
       for (let i = 0; i<deck.length; i++) {
         sendableDeck.push(deck[i].toString());
       }
@@ -78,18 +101,22 @@ function setMyHandOnclick(action) {
 
 function setDiscardPileOnclick() {
   discardPile.click(() => { // doesn't matter which card is clicked
-    while (discardPile.length > 0) {
-      deck.addCard(discardPile[0]); // playPile changes length when you remove a card from it
+    if (deck.length > 0) {
+      alert('The deck has to be empty before you can reshuffle.');
+    } else {
+      while (discardPile.length > 0) {
+        deck.addCard(discardPile[0]); // playPile changes length when you remove a card from it
+      }
+      cards.shuffle(deck);
+      let sendableDeck = [];
+      for (let i=0; i<deck.length; i++) {
+        sendableDeck.push(deck[i].toString());
+      }
+      while (deck.length > 0) {
+        deck.obliterateCard(deck[0]);
+      }
+      sendEvent({type: 'replenishDeck', msg: {deck: sendableDeck}, clientID});
     }
-    cards.shuffle(deck);
-    sendableDeck = [];
-    for (let i=0; i<deck.length; i++) {
-      sendableDeck.push(deck[i].toString());
-    }
-    while (deck.length > 0) {
-      deck.obliterateCard(deck[0]);
-    }
-    sendEvent({type: 'replenishDeck', msg: {deck: sendableDeck}, clientID});
   });
 }
 
@@ -136,13 +163,21 @@ function setPlayPileOnclick(action) {
 }
 
 function displayScreenNames(names) {
-  document.querySelector('#player-label-B').innerText = names[0];
-  document.querySelector('#player-label-L').innerText = names[1];
-  document.querySelector('#player-label-T').innerText = names[2];
-  document.querySelector('#player-label-R').innerText = names[3];
+  for (let i=0; i<clients.length; i++) {
+    document.querySelector('#player-label-container').append(document.createElement('div'));
+    let label = document.querySelector('#player-label-container').children[i]
+    label.classList = 'player-label';
+    label.style.left = handPositions[names.length][i].x + 'px';
+    if (i !== 0) {
+      label.style.top = handPositions[names.length][i].y + 'px';
+    } else {
+      label.style.top = '280px'; // have some space between myHand and the label
+    }
+    label.innerText = names[i];
+  }
 }
 
-function createNetworkCard(string, client) {
+function createNetworkCard(string) {
   let card;
   if (string.length === 4) {
     card = new cards.Card(string[0], string[1]+string[2]+string[3], table);
@@ -151,9 +186,6 @@ function createNetworkCard(string, client) {
   } else {
     card = new cards.Card(string[0], string[1], table);
   }
-  //if (clientID) {
-  //  card.container = hands[client];
-  //} TEST THIS
   return card;
 }
 
@@ -192,37 +224,48 @@ function processGameEvent(data) {
     if (!hands.myHand) {
       screenNames = data.msg.screenNames;
       clients = data.msg.clients;
-      if (clients.indexOf(clientID) === 0) {
+      /*if (clients.indexOf(clientID) === 0) {
         hands = {myHand: new cards.Hand({faceUp: true, x: 300, y: 350})};
         hands[clients[1]] = new cards.Hand({faceUp: false, x: 50, y: 200});
         hands[clients[2]] = new cards.Hand({faceUp: false, x: 300, y: 50});
         hands[clients[3]] = new cards.Hand({faceUp: false, x: 550, y: 200});
-        handsArray = [hands.myHand, hands[clients[1]], hands[clients[2]], hands[clients[3]]];
       } else if (clients.indexOf(clientID) === 1) {
         hands = {myHand: new cards.Hand({faceUp: true, x: 300, y: 350})};
         hands[clients[2]] = new cards.Hand({faceUp: false, x: 50, y: 200});
         hands[clients[3]] = new cards.Hand({faceUp: false, x: 300, y: 50});
         hands[clients[0]] = new cards.Hand({faceUp: false, x: 550, y: 200});
-        handsArray = [hands[clients[0]], hands.myHand, hands[clients[2]], hands[clients[3]]];
-        screenNames.push(screenNames.shift());
       }  else if (clients.indexOf(clientID) === 2) {
         hands = {myHand: new cards.Hand({faceUp: true, x: 300, y: 350})};
         hands[clients[3]] = new cards.Hand({faceUp: false, x: 50, y: 200});
         hands[clients[0]] = new cards.Hand({faceUp: false, x: 300, y: 50});
         hands[clients[1]] = new cards.Hand({faceUp: false, x: 550, y: 200});
-        screenNames.push(screenNames.shift());
-        screenNames.push(screenNames.shift());
-        handsArray = [hands[clients[0]], hands[clients[1]], hands.myHand, hands[clients[3]]];
       } else if (clients.indexOf(clientID) === 3) {
         hands = {myHand: new cards.Hand({faceUp: true, x: 300, y: 350})};
         hands[clients[0]] = new cards.Hand({faceUp: false, x: 50, y: 200});
         hands[clients[1]] = new cards.Hand({faceUp: false, x: 300, y: 50});
         hands[clients[2]] = new cards.Hand({faceUp: false, x: 550, y: 200});
-        screenNames.push(screenNames.shift());
-        screenNames.push(screenNames.shift());
-        screenNames.push(screenNames.shift());
-        handsArray = [hands[clients[0]], hands[clients[1]], hands[clients[2]], hands.myHand];
+      }*/
+      for (let i=0; i<clients.length; i++) {
+        if (i === clients.indexOf(clientID)) {
+          hands.myHand = new cards.Hand({faceUp: true, x: 300, y: 350});
+          handsArray.push(hands.myHand);
+        } else {
+          hands[clients[i]] = new cards.Hand({faceUp: false});
+          handsArray.push(hands[clients[i]]);
+        }
       }
+
+      let orderedHandsArray = Array.from(handsArray);
+      for (let i=0; i<clients.indexOf(clientID); i++) {
+        screenNames.push(screenNames.shift());
+        orderedHandsArray.push(orderedHandsArray.shift());
+      }
+ 
+      for (let i=0; i<orderedHandsArray.length; i++) {
+        orderedHandsArray[i].x = handPositions[orderedHandsArray.length][i].x;
+        orderedHandsArray[i].y = handPositions[orderedHandsArray.length][i].y;
+      }
+
       displayScreenNames(screenNames);
     } else {
       for (let hand of handsArray) {
@@ -247,7 +290,7 @@ function processGameEvent(data) {
       hands.myHand.faceUp = false;
       hands.myHand.render();
     }
-    deck.deal(data.msg.howManyCards, handsArray, 40, () => {
+    deck.deal(data.msg.howManyCards, handsArray, 30, () => {
       if (data.msg.capsDeal) {
         for (let hand in hands) {
           hands[hand][hands[hand].length - 1].showCard();
@@ -285,7 +328,7 @@ function processGameEvent(data) {
     for (let hand in hands) {
       if (hands[hand].claimant) {
         claimedCount++;
-        if (claimedCount === 4) {
+        if (claimedCount === clients.length) {
           let tempHands = {};
           for (let client of clients) {
             if (client === clientID) { client = 'myHand'; }
@@ -360,21 +403,17 @@ function processGameEvent(data) {
 
   } else if (data.type === 'replenishDeck') {
 
-    if (deck.length > 0) {
-      alert('The deck has to be empty before you can reshuffle.');
-    } else {
-      deck = new cards.Deck({x: 50, y: 350});
-      setDeckOnclick();
-  
-      for (let card of data.msg.deck) {
-        deck.addCard(createNetworkCard(card));
-      }
-      while (discardPile.length > 0) {
-        discardPile.obliterateCard(discardPile[0]);
-      }
-      deck.render();
-      discardPile.render();
+    deck = new cards.Deck({x: 50, y: 350});
+    setDeckOnclick();
+
+    for (let card of data.msg.deck) {
+      deck.addCard(createNetworkCard(card));
     }
+    while (discardPile.length > 0) {
+      discardPile.obliterateCard(discardPile[0]);
+    }
+    deck.render();
+    discardPile.render();
 
   } else if (data.type === 'disableTrading') {
 
