@@ -1,4 +1,5 @@
 let table = document.querySelector('#card-table');
+let directionButton = document.querySelector('#direction-button');
 const tableContainer = document.querySelector('#card-table-container');
 cards.init({acesHigh: true, table: '#card-table'});
 
@@ -40,6 +41,13 @@ function resetTable() {
   tableContainer.append(document.createElement('div'));
   tableContainer.children[tableContainer.children.length - 1].setAttribute('id', 'card-table');
   table = document.querySelector('#card-table');
+
+  table.append(document.createElement('img'));
+  table.children[table.children.length - 1].setAttribute('id', 'direction-button');
+  directionButton = document.querySelector('#direction-button');
+  directionButton.setAttribute('src', '/img/sync-alt-solid.svg');
+  directionButton.classList.add('h-mirror');
+
   document.querySelector('#sort-hand-caps').disabled = true;
   document.querySelector('#sort-hand-by-suit').disabled = true;
 }
@@ -79,6 +87,18 @@ document.querySelector('#trade-switch').onclick = () => {
     sendEvent({type: 'disableTrading'});
   }
 };
+
+function setDirectionButtonOnclick() {
+  document.querySelector('#direction-button').onclick = () => {
+    let newDirection;
+    if (directionButton.classList.contains('h-mirror')) {
+      newDirection = 'counterclockwise';
+    } else {
+      newDirection = 'clockwise';
+    }
+    sendEvent({type: 'changeDirection', msg: {newDirection}});
+  };
+}
 
 function setDeckOnclick() {
   deck.click(function(card) {
@@ -224,27 +244,7 @@ function processGameEvent(data) {
     if (!hands.myHand) {
       screenNames = data.msg.screenNames;
       clients = data.msg.clients;
-      /*if (clients.indexOf(clientID) === 0) {
-        hands = {myHand: new cards.Hand({faceUp: true, x: 300, y: 350})};
-        hands[clients[1]] = new cards.Hand({faceUp: false, x: 50, y: 200});
-        hands[clients[2]] = new cards.Hand({faceUp: false, x: 300, y: 50});
-        hands[clients[3]] = new cards.Hand({faceUp: false, x: 550, y: 200});
-      } else if (clients.indexOf(clientID) === 1) {
-        hands = {myHand: new cards.Hand({faceUp: true, x: 300, y: 350})};
-        hands[clients[2]] = new cards.Hand({faceUp: false, x: 50, y: 200});
-        hands[clients[3]] = new cards.Hand({faceUp: false, x: 300, y: 50});
-        hands[clients[0]] = new cards.Hand({faceUp: false, x: 550, y: 200});
-      }  else if (clients.indexOf(clientID) === 2) {
-        hands = {myHand: new cards.Hand({faceUp: true, x: 300, y: 350})};
-        hands[clients[3]] = new cards.Hand({faceUp: false, x: 50, y: 200});
-        hands[clients[0]] = new cards.Hand({faceUp: false, x: 300, y: 50});
-        hands[clients[1]] = new cards.Hand({faceUp: false, x: 550, y: 200});
-      } else if (clients.indexOf(clientID) === 3) {
-        hands = {myHand: new cards.Hand({faceUp: true, x: 300, y: 350})};
-        hands[clients[0]] = new cards.Hand({faceUp: false, x: 50, y: 200});
-        hands[clients[1]] = new cards.Hand({faceUp: false, x: 300, y: 50});
-        hands[clients[2]] = new cards.Hand({faceUp: false, x: 550, y: 200});
-      }*/
+      
       for (let i=0; i<clients.length; i++) {
         if (i === clients.indexOf(clientID)) {
           hands.myHand = new cards.Hand({faceUp: true, x: 300, y: 350});
@@ -300,6 +300,8 @@ function processGameEvent(data) {
         }
       }
     });
+
+    setDirectionButtonOnclick();
 
     document.querySelector('#sort-hand-caps').disabled = false;
     document.querySelector('#sort-hand-by-suit').disabled = false;
@@ -437,6 +439,14 @@ function processGameEvent(data) {
     } else {
       hands.myHand.addCard(playPile.topCard());
       hands.myHand.render();
+    }
+
+  } else if (data.type === 'changeDirection'){
+
+    if (data.msg.newDirection === 'counterclockwise') {
+      directionButton.classList.remove('h-mirror'); 
+    } else {
+      directionButton.classList.add('h-mirror');
     }
 
   }
